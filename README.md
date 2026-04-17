@@ -127,9 +127,11 @@ If Brave key is missing or fails, the app auto-falls back to DuckDuckGo.
 
 ## 🤖 OpenRouter Free Models (examples)
 
+- `meta-llama/llama-3.1-8b-instruct:free`
 - `mistralai/mistral-7b-instruct:free`
-- `meta-llama/llama-3.3-70b-instruct:free`
-- `google/gemma-3-27b-it:free`
+- `qwen/qwen3-8b:free`
+- `google/gemma-2-9b-it:free`
+- `deepseek/deepseek-r1-0528:free`
 
 > OpenRouter free model availability can change over time. Check OpenRouter model list for latest.
 
