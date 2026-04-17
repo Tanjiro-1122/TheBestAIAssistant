@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { MAX_CHAT_TITLE_LENGTH } from '../constants'
+import { getApiUrl } from '../lib/apiBase'
 
 function createChat() {
   const id = crypto.randomUUID()
@@ -20,7 +21,7 @@ export function useMemory() {
   useEffect(() => {
     async function loadHistory() {
       try {
-        const { data } = await axios.get('/api/history')
+        const { data } = await axios.get(getApiUrl('/api/history'))
         setChats(data)
         setCurrentChatId(data[0]?.id || null)
       } catch {
@@ -37,7 +38,7 @@ export function useMemory() {
 
   const persistChat = async (chat) => {
     try {
-      await axios.post('/api/history', chat)
+      await axios.post(getApiUrl('/api/history'), chat)
     } catch {
       // Keep UI responsive even if persistence fails.
     }
