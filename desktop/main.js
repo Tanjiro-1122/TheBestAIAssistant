@@ -9,7 +9,8 @@ const APP_NAME = 'SuperAgent AI Assistant';
 const START_PORT = 3001;
 const MAX_PORT_TRIES = 10;
 const HEALTH_TIMEOUT_MS = 15_000;
-const HEALTH_POLL_INTERVAL_MS = 300;
+const HEALTH_POLL_INTERVAL_MS = 500;
+const MAX_STDERR_BUFFER_SIZE = 4000;
 
 let loadingWindow;
 let mainWindow;
@@ -66,6 +67,7 @@ async function findAvailablePort(startPort) {
 
 function waitForBackendHealth(port, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
+  let lastError = '';
 
   return new Promise((resolve, reject) => {
     const poll = () => {
@@ -85,9 +87,10 @@ function waitForBackendHealth(port, timeoutMs) {
         setTimeout(poll, HEALTH_POLL_INTERVAL_MS);
       });
 
-      req.on('error', () => {
+      req.on('error', (error) => {
+        lastError = error?.message || lastError;
         if (Date.now() > deadline) {
-          reject(new Error('Backend health check timed out'));
+          reject(new Error(`Backend health check timed out${lastError ? `: ${lastError}` : ''}`));
           return;
         }
 
@@ -171,12 +174,11 @@ function createTray() {
   );
 
   tray.on('click', () => {
-    if (!mainWindow) return;
-    if (mainWindow.isVisible()) {
+    if (mainWindow?.isVisible()) {
       mainWindow.hide();
     } else {
-      mainWindow.show();
-      mainWindow.focus();
+      mainWindow?.show();
+      mainWindow?.focus();
     }
   });
 }
@@ -212,7 +214,7 @@ async function createMainWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      sandbox: false,
+      sandbox: true,
       additionalArguments: [`--superagent-backend=http://127.0.0.1:${backendPort}`],
     },
   });
@@ -264,13 +266,14 @@ async function startBackendProcess() {
 
   backendProcess.stderr.on('data', (chunk) => {
     const output = chunk.toString();
-    backendStderr = `${backendStderr}${output}`.slice(-4000);
+    backendStderr = `${backendStderr}${output}`.slice(-MAX_STDERR_BUFFER_SIZE);
     process.stderr.write(`[backend] ${output}`);
   });
 
   backendProcess.on('exit', (code) => {
     if (!isQuitting && code !== 0) {
       dialog.showErrorBox('Backend stopped unexpectedly', backendStderr || `Exit code: ${code}`);
+      app.quit();
     }
   });
 }
@@ -299,12 +302,6 @@ app.whenReady().then(bootApp);
 app.on('before-quit', () => {
   isQuitting = true;
   stopBackendProcess();
-});
-
-app.on('window-all-closed', (event) => {
-  if (!isQuitting) {
-    event.preventDefault();
-  }
 });
 
 app.on('activate', () => {

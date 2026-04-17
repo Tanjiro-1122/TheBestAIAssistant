@@ -8,7 +8,12 @@ function getBackendBaseUrlFromQuery() {
     return '';
   }
 
-  return `http://127.0.0.1:${value}`;
+  const port = Number(value);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    return '';
+  }
+
+  return `http://127.0.0.1:${port}`;
 }
 
 export function getApiUrl(path) {
