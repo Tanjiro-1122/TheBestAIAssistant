@@ -102,6 +102,8 @@ export default function ChatWindow({
             }}
             placeholder="Message SuperAgent..."
             rows={2}
+            aria-invalid={Boolean(inputError)}
+            aria-describedby={inputError ? 'chat-input-error' : undefined}
             className="min-h-[44px] flex-1 resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
           <button
@@ -112,7 +114,11 @@ export default function ChatWindow({
             Send
           </button>
         </form>
-        {inputError && <p className="text-xs text-red-600 dark:text-red-400">{inputError}</p>}
+        {inputError && (
+          <p id="chat-input-error" className="text-xs text-red-600 dark:text-red-400">
+            {inputError}
+          </p>
+        )}
       </div>
     </section>
   )
