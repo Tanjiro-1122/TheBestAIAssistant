@@ -1,9 +1,9 @@
 const { app, BrowserWindow, Menu, Tray, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const net = require('net');
 const http = require('http');
-const isDev = require('electron-is-dev');
 
 const APP_NAME = 'SuperAgent AI Assistant';
 const START_PORT = 3001;
@@ -239,10 +239,13 @@ async function createMainWindow() {
     }
   });
 
-  if (isDev) {
+  const distPath = getClientDistPath();
+  const useDevServer = !fs.existsSync(distPath);
+
+  if (useDevServer) {
     await mainWindow.loadURL(`http://localhost:5173/?backendPort=${backendPort}`);
   } else {
-    await mainWindow.loadFile(getClientDistPath(), { query: { backendPort: String(backendPort) } });
+    await mainWindow.loadFile(distPath, { query: { backendPort: String(backendPort) } });
   }
 }
 

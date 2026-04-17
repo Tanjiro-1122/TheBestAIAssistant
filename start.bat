@@ -17,10 +17,11 @@ if not exist "desktop\node_modules" (
     cd desktop && npm install && cd ..
 )
 
-if not exist "client\dist" (
+if not exist "client\dist\index.html" (
     echo Building client...
     cd client && npm run build && cd ..
 )
 
 echo Launching app...
+set NODE_ENV=production
 cd desktop && npm start
