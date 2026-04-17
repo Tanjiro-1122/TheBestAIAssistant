@@ -22,7 +22,7 @@ export default function ChatWindow({
   useEffect(() => {
     if (!messagesRef.current) return
     messagesRef.current.scrollTop = messagesRef.current.scrollHeight
-  }, [messages.length, steps.length, isStreaming])
+  }, [messages, steps])
 
   const submitMessage = () => {
     if (!input.trim() || isStreaming) return
