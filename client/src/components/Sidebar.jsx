@@ -1,4 +1,5 @@
 import SettingsPanel from './SettingsPanel'
+import GitHubReposPanel from './GitHubReposPanel'
 
 export default function Sidebar({ chats, currentChatId, onSelectChat, onNewChat, settings, setSettings, theme, toggleTheme }) {
   return (
@@ -42,7 +43,10 @@ export default function Sidebar({ chats, currentChatId, onSelectChat, onNewChat,
         )}
       </div>
 
-      <SettingsPanel settings={settings} setSettings={setSettings} />
+      <div className="space-y-3">
+        <SettingsPanel settings={settings} setSettings={setSettings} />
+        <GitHubReposPanel settings={settings} setSettings={setSettings} />
+      </div>
     </aside>
   )
 }

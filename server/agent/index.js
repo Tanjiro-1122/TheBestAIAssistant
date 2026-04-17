@@ -4,6 +4,7 @@ const { searchTool } = require('./tools/search');
 const { calculator } = require('./tools/calculator');
 const { codeRunner } = require('./tools/codeRunner');
 const { urlFetcher } = require('./tools/urlFetcher');
+const { githubRepoTool } = require('./tools/githubRepo');
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // Five steps balances depth and latency: enough for plan->tool->observation cycles,
@@ -11,14 +12,34 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // a fallback asking the user to refine the request.
 const MAX_REASONING_STEPS = 5;
 
-function buildSystemPrompt(enabledTools) {
+function buildSystemPrompt(enabledTools, activeGithubRepos) {
+  const githubRepoInstructions = `
+
+githubrepo — Browse and read GitHub repositories.
+  Usage:
+    TOOL: githubrepo
+    INPUT: list files: owner/repo
+    
+    TOOL: githubrepo
+    INPUT: read file: owner/repo src/index.js
+    
+    TOOL: githubrepo
+    INPUT: search: owner/repo function handleAuth`;
+
+  const activeReposText = activeGithubRepos.length
+    ? `\n\nActive GitHub repos: ${activeGithubRepos.join(', ')}`
+    : '';
+
   return `You are a powerful AI SuperAgent. You have access to tools and can use multi-step reasoning to solve complex problems.
 
 Available tools: ${enabledTools.join(', ') || 'none'}
+${activeReposText}
 
 To use a tool, respond with:
 TOOL: <tool_name>
 INPUT: <tool_input>
+
+${githubRepoInstructions}
 
 After observing the tool output, continue reasoning. When you have the final answer, respond with:
 FINAL ANSWER: <your answer>`;
@@ -87,6 +108,9 @@ async function runAgent({
   const {
     apiKey,
     braveApiKey,
+    githubToken,
+    githubRepos = [],
+    activeGithubRepos = [],
     model = 'mistralai/mistral-7b-instruct:free',
     temperature = 0.4,
     enabledTools = {
@@ -95,6 +119,7 @@ async function runAgent({
       coderunner: true,
       urlfetcher: true,
       fileanalysis: true,
+      githubrepo: true,
     },
   } = settings || {};
 
@@ -102,13 +127,18 @@ async function runAgent({
     throw new Error('OpenRouter API key is required');
   }
 
+  const normalizedRepos = Array.isArray(githubRepos) ? githubRepos : [];
+  const normalizedActiveRepos = Array.isArray(activeGithubRepos)
+    ? activeGithubRepos
+    : normalizedRepos;
+
   const shortMemory = buildShortTermMemory(history, 8);
   const enabledToolNames = Object.entries(enabledTools)
     .filter(([, enabled]) => enabled)
     .map(([name]) => name);
 
   const messages = [
-    { role: 'system', content: buildSystemPrompt(enabledToolNames) },
+    { role: 'system', content: buildSystemPrompt(enabledToolNames, normalizedActiveRepos) },
     ...shortMemory,
     {
       role: 'user',
@@ -123,6 +153,11 @@ async function runAgent({
     calculator: async (input) => calculator(input),
     coderunner: async (input) => codeRunner(input),
     urlfetcher: (input) => urlFetcher(input),
+    githubrepo: (input) => githubRepoTool(input, {
+      token: githubToken,
+      repos: normalizedRepos,
+      activeRepos: normalizedActiveRepos,
+    }),
     fileanalysis: async () => ({
       ok: true,
       result: uploadedText ? uploadedText.slice(0, 4000) : 'No uploaded file context available.',
