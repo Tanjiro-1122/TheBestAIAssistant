@@ -8,6 +8,9 @@ import { MAX_CHAT_TITLE_LENGTH } from './constants'
 const defaultSettings = {
   apiKey: '',
   braveApiKey: '',
+  githubToken: '',
+  githubRepos: [],
+  activeGithubRepos: [],
   model: 'meta-llama/llama-3.1-8b-instruct:free',
   temperature: 0.4,
   enabledTools: {
@@ -16,6 +19,7 @@ const defaultSettings = {
     coderunner: true,
     urlfetcher: true,
     fileanalysis: true,
+    githubrepo: true,
   },
 }
 
@@ -33,6 +37,10 @@ function App() {
     return {
       ...defaultSettings,
       ...parsed,
+      githubRepos: Array.isArray(parsed.githubRepos) ? parsed.githubRepos : defaultSettings.githubRepos,
+      activeGithubRepos: Array.isArray(parsed.activeGithubRepos)
+        ? parsed.activeGithubRepos
+        : (Array.isArray(parsed.githubRepos) ? parsed.githubRepos : defaultSettings.activeGithubRepos),
       enabledTools: {
         ...defaultSettings.enabledTools,
         ...(parsed.enabledTools || {}),
@@ -73,6 +81,9 @@ function App() {
       settings: {
         apiKey: settings.apiKey,
         braveApiKey: settings.braveApiKey,
+        githubToken: settings.githubToken,
+        githubRepos: settings.githubRepos,
+        activeGithubRepos: settings.activeGithubRepos,
         model: settings.model,
         temperature: settings.temperature,
         enabledTools: settings.enabledTools,
