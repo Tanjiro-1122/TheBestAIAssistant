@@ -18,6 +18,8 @@ export default function SettingsPanel({ settings, setSettings }) {
       <label className="block text-xs text-slate-600 dark:text-slate-400">
         OpenRouter API Key
         <input
+          id="openrouter-api-key"
+          name="apiKey"
           type="password"
           value={settings.apiKey}
           onChange={(event) => update({ apiKey: event.target.value })}
@@ -29,6 +31,8 @@ export default function SettingsPanel({ settings, setSettings }) {
       <label className="block text-xs text-slate-600 dark:text-slate-400">
         Brave API Key (optional)
         <input
+          id="brave-api-key"
+          name="braveApiKey"
           type="password"
           value={settings.braveApiKey}
           onChange={(event) => update({ braveApiKey: event.target.value })}
@@ -40,6 +44,8 @@ export default function SettingsPanel({ settings, setSettings }) {
       <label className="block text-xs text-slate-600 dark:text-slate-400">
         Model
         <select
+          id="model"
+          name="model"
           value={settings.model}
           onChange={(event) => update({ model: event.target.value })}
           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-200"
@@ -53,6 +59,8 @@ export default function SettingsPanel({ settings, setSettings }) {
       <label className="block text-xs text-slate-600 dark:text-slate-400">
         Temperature: {settings.temperature}
         <input
+          id="temperature"
+          name="temperature"
           type="range"
           min="0"
           max="1"
@@ -67,6 +75,8 @@ export default function SettingsPanel({ settings, setSettings }) {
         {Object.entries(settings.enabledTools).map(([tool, enabled]) => (
           <label key={tool} className="flex items-center gap-2">
             <input
+              id={`tool-${tool}`}
+              name={`tool-${tool}`}
               type="checkbox"
               checked={enabled}
               onChange={(event) => updateTools(tool, event.target.checked)}
