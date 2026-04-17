@@ -5,6 +5,7 @@ const path = require('path');
 
 const chatRouter = require('./routes/chat');
 const historyRouter = require('./routes/history');
+const testRouter = require('./routes/test');
 const uploadRouter = require('./routes/upload');
 
 const app = express();
@@ -20,6 +21,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/chat', chatRouter);
 app.use('/api/history', historyRouter);
+app.use('/api/test', testRouter);
 app.use('/api/upload', uploadRouter);
 
 app.use((err, _req, res, _next) => {

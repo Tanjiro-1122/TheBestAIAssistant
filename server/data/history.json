@@ -1,6 +1,20 @@
 {
   "chats": [
     {
+      "id": "b2baa520-4f1b-4e41-bd14-c135f456a5ed",
+      "title": "New chat",
+      "messages": [],
+      "createdAt": "2026-04-17T04:07:37.572Z",
+      "updatedAt": "2026-04-17T04:07:37.574Z"
+    },
+    {
+      "id": "ad74d08b-07ff-4971-89b5-81078a84f0ca",
+      "title": "New chat",
+      "messages": [],
+      "createdAt": "2026-04-17T04:07:37.569Z",
+      "updatedAt": "2026-04-17T04:07:37.569Z"
+    },
+    {
       "id": "04bffe28-f71a-4fed-9706-cc418e6283b2",
       "title": "New chat",
       "messages": [],
