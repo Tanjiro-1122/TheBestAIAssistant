@@ -1,0 +1,25 @@
+{
+  "chats": [
+    {
+      "id": "04bffe28-f71a-4fed-9706-cc418e6283b2",
+      "title": "New chat",
+      "messages": [],
+      "createdAt": "2026-04-17T03:06:39.115Z",
+      "updatedAt": "2026-04-17T03:06:39.115Z"
+    },
+    {
+      "id": "841d1ff1-8117-44d7-aadc-dc1b4e773976",
+      "title": "New chat",
+      "messages": [],
+      "createdAt": "2026-04-17T03:06:39.071Z",
+      "updatedAt": "2026-04-17T03:06:39.071Z"
+    },
+    {
+      "id": "cc3ed818-fc23-4b08-9d73-7a846d662d54",
+      "title": "New chat",
+      "messages": [],
+      "createdAt": "2026-04-17T03:06:39.066Z",
+      "updatedAt": "2026-04-17T03:06:39.066Z"
+    }
+  ]
+}
