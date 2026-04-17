@@ -1,13 +1,41 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 import MessageBubble from './MessageBubble'
 import ThinkingSteps from './ThinkingSteps'
 import FileUpload from './FileUpload'
 
-export default function ChatWindow({ currentChat, onSend, isStreaming, steps, uploadedFile, setUploadedFile }) {
+export default function ChatWindow({
+  currentChat,
+  onSend,
+  settings,
+  isStreaming,
+  steps,
+  uploadedFile,
+  setUploadedFile,
+}) {
   const [input, setInput] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [inputError, setInputError] = useState('')
+  const messagesRef = useRef(null)
   const messages = useMemo(() => currentChat?.messages || [], [currentChat])
+
+  useEffect(() => {
+    if (!messagesRef.current) return
+    messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+  }, [messages, steps])
+
+  const submitMessage = () => {
+    if (!input.trim() || isStreaming) return
+
+    if (!settings?.apiKey?.trim()) {
+      setInputError('Please enter your OpenRouter API key in Agent Settings below.')
+      return
+    }
+
+    onSend(input)
+    setInput('')
+    setInputError('')
+  }
 
   const handleUpload = async (file) => {
     setUploading(true)
@@ -29,7 +57,7 @@ export default function ChatWindow({ currentChat, onSend, isStreaming, steps, up
         SuperAgent AI Assistant
       </div>
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+      <div ref={messagesRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-500 dark:border-slate-700">
             Ask anything to start your first run.
@@ -57,16 +85,25 @@ export default function ChatWindow({ currentChat, onSend, isStreaming, steps, up
           className="flex gap-2"
           onSubmit={(event) => {
             event.preventDefault()
-            if (!input.trim() || isStreaming) return
-            onSend(input)
-            setInput('')
+            submitMessage()
           }}
         >
           <textarea
             value={input}
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) => {
+              setInput(event.target.value)
+              if (inputError) setInputError('')
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault()
+                submitMessage()
+              }
+            }}
             placeholder="Message SuperAgent..."
             rows={2}
+            aria-invalid={Boolean(inputError)}
+            aria-describedby={inputError ? 'chat-input-error' : undefined}
             className="min-h-[44px] flex-1 resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
           <button
@@ -77,6 +114,11 @@ export default function ChatWindow({ currentChat, onSend, isStreaming, steps, up
             Send
           </button>
         </form>
+        {inputError && (
+          <p id="chat-input-error" className="text-xs text-red-600 dark:text-red-400">
+            {inputError}
+          </p>
+        )}
       </div>
     </section>
   )

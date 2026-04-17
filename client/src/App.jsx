@@ -27,7 +27,17 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('agentSettings')
-    return saved ? JSON.parse(saved) : defaultSettings
+    if (!saved) return defaultSettings
+
+    const parsed = JSON.parse(saved)
+    return {
+      ...defaultSettings,
+      ...parsed,
+      enabledTools: {
+        ...defaultSettings.enabledTools,
+        ...(parsed.enabledTools || {}),
+      },
+    }
   })
 
   useEffect(() => {
@@ -60,7 +70,13 @@ function App() {
     await runAgent({
       message: content,
       history: currentChat?.messages || [],
-      settings,
+      settings: {
+        apiKey: settings.apiKey,
+        braveApiKey: settings.braveApiKey,
+        model: settings.model,
+        temperature: settings.temperature,
+        enabledTools: settings.enabledTools,
+      },
       uploadedText: uploadedFile?.text || '',
       onEvent: ({ event, data }) => {
         if (event === 'thinking') {
@@ -133,6 +149,7 @@ function App() {
         <ChatWindow
           currentChat={currentChat}
           onSend={handleSend}
+          settings={settings}
           isStreaming={isStreaming}
           steps={steps}
           uploadedFile={uploadedFile}
