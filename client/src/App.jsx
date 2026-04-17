@@ -11,7 +11,7 @@ const defaultSettings = {
   githubToken: '',
   githubRepos: [],
   activeGithubRepos: [],
-  model: 'mistralai/mistral-7b-instruct:free',
+  model: 'meta-llama/llama-3.1-8b-instruct:free',
   temperature: 0.4,
   enabledTools: {
     search: true,

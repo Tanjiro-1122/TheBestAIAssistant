@@ -77,25 +77,45 @@ function streamTextTokens(send, text) {
 }
 
 async function queryModel({ messages, model, temperature, apiKey }) {
-  const response = await axios.post(
-    OPENROUTER_URL,
-    {
-      model,
-      temperature,
-      messages,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://thebestaiassistant.local',
-        'X-Title': 'TheBestAIAssistant',
+  try {
+    const response = await axios.post(
+      OPENROUTER_URL,
+      {
+        model,
+        temperature,
+        messages,
       },
-      timeout: 30000,
-    }
-  );
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://thebestaiassistant.local',
+          'X-Title': 'TheBestAIAssistant',
+        },
+        timeout: 30000,
+      }
+    );
 
-  return response.data?.choices?.[0]?.message?.content || '';
+    return response.data?.choices?.[0]?.message?.content || '';
+  } catch (error) {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      throw new Error('OpenRouter authentication failed (401). Please check your API key.');
+    }
+
+    if (status === 404) {
+      throw new Error(`OpenRouter model not found (404): "${model}". Please choose a valid model.`);
+    }
+
+    if (status === 429) {
+      throw new Error('OpenRouter rate limit exceeded (429). Please wait and try again.');
+    }
+
+    throw new Error(
+      error?.response?.data?.error?.message || 'OpenRouter request failed. Please try again.'
+    );
+  }
 }
 
 async function runAgent({
@@ -111,7 +131,7 @@ async function runAgent({
     githubToken,
     githubRepos = [],
     activeGithubRepos = [],
-    model = 'mistralai/mistral-7b-instruct:free',
+    model = 'meta-llama/llama-3.1-8b-instruct:free',
     temperature = 0.4,
     enabledTools = {
       search: true,
