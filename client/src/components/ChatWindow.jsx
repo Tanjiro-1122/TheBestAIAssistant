@@ -3,6 +3,7 @@ import axios from 'axios'
 import MessageBubble from './MessageBubble'
 import ThinkingSteps from './ThinkingSteps'
 import FileUpload from './FileUpload'
+import { getApiUrl } from '../lib/apiBase'
 
 export default function ChatWindow({
   currentChat,
@@ -42,7 +43,7 @@ export default function ChatWindow({
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const { data } = await axios.post('/api/upload', formData)
+      const { data } = await axios.post(getApiUrl('/api/upload'), formData)
       setUploadedFile({ name: data.fileName, text: data.text })
     } catch {
       setUploadedFile({ name: file.name, text: '', error: 'Upload failed.' })

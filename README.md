@@ -172,6 +172,28 @@ Frontend starts on `http://localhost:5173` and proxies `/api/*` to backend.
 
 ---
 
+## 🖥️ Desktop App (Windows)
+
+Run as a desktop app — no terminals needed!
+
+### Quick Start
+```bash
+cd desktop
+npm install
+npm start
+```
+
+### Build a .exe installer
+```bash
+cd client && npm run build
+cd ../desktop
+npm install
+npm run build
+```
+The installer will be in `desktop/dist/`.
+
+---
+
 ## 🧪 Build / Validate
 
 ```bash

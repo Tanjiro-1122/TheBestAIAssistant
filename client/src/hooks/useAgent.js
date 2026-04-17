@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getApiUrl } from '../lib/apiBase'
 
 function parseSSEChunk(chunk) {
   const events = []
@@ -28,7 +29,7 @@ export function useAgent() {
     setIsStreaming(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,0 +1,54 @@
+{
+  "name": "superagent-desktop",
+  "version": "1.0.0",
+  "description": "SuperAgent AI Assistant Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder --win --x64",
+    "build:all": "electron-builder --win --mac --linux"
+  },
+  "build": {
+    "appId": "com.superagent.assistant",
+    "productName": "SuperAgent AI Assistant",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "loading.html",
+      "assets/**"
+    ],
+    "extraFiles": [
+      {
+        "from": "../server",
+        "to": "server",
+        "filter": [
+          "**/*",
+          "!node_modules/**"
+        ]
+      },
+      {
+        "from": "../client/dist",
+        "to": "client/dist"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-is-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "^39.8.1",
+    "electron-builder": "^24.0.0"
+  }
+}
